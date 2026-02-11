@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
     private FlyWheel intake = new FlyWheel(intakeConfig);
 
-    // 5:1, 5:1, 60/18 reduction
+    // 5:1, 5:1, 60/18 reduction (cranberry)
     private SmartMotorControllerConfig intakePivotSmartMotorConfig = new SmartMotorControllerConfig(this)
         .withControlMode(ControlMode.CLOSED_LOOP)
         .withClosedLoopController(25,0,0,DegreesPerSecond.of(360),DegreesPerSecondPerSecond.of(360))
