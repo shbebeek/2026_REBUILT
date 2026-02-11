@@ -16,4 +16,20 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class DriveConstants {
+    public static final double DRIVE_SPEED = 1.0;
+
+    // motor ids 0-7
+    public static final int[] kDriverIds = new int[4];
+    public static final int[] kEncoderIds = new int[4];
+  }
+
+  public static class IntakeConstants {
+    public static final double INTAKE_SPEED = 1.0;
+    
+    // motor ids 8-_
+    public static final Integer kRollerMotorId = 8;
+    public static final Integer kPivotMotorId = 9;
+  }
 }
