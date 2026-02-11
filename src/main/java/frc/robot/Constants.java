@@ -21,15 +21,22 @@ public final class Constants {
     public static final double DRIVE_SPEED = 1.0;
 
     // motor ids 0-7
-    public static final int[] kDriverIds = new int[4];
+    public static final int[] kDriverIds = new int[8];
     public static final int[] kEncoderIds = new int[4];
   }
 
   public static class IntakeConstants {
     public static final double INTAKE_SPEED = 1.0;
     
-    // motor ids 8-_
-    public static final Integer kRollerMotorId = 8;
-    public static final Integer kPivotMotorId = 9;
+    // motor id 12-13
+    public static final Integer kRollerMotorId = 12;
+    public static final Integer kPivotMotorId = 13;
+  }
+
+  public static class HopperConstants {
+    public static final double HOPPER_SPEED = 1.0;
+
+    // motor id 14
+    public static final Integer kHopperMotorId = 14;
   }
 }

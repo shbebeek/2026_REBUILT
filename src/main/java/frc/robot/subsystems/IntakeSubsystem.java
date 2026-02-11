@@ -14,6 +14,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import yams.gearing.GearBox;
@@ -80,5 +83,75 @@ public class IntakeSubsystem extends SubsystemBase{
 
     public IntakeSubsystem(){
         
+    }
+
+    // run intake while held
+    public Command intakeCommand(){
+        return intake.set(Constants.IntakeConstants.INTAKE_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Intake.Run");
+    }
+
+    // eject while held
+    public Command ejectCommand(){
+        return intake.set(-Constants.IntakeConstants.INTAKE_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Intake.Eject");
+    }
+
+    // angle intake at a specific angle
+    public Command setpivotAngle(Angle angle){
+        return intakePivot.setAngle(angle).withName("IntakePivot.SetAngle");
+    }
+
+    // reset encoder
+    public Command rezero(){
+        return Commands.runOnce(() -> pivotMotor.getEncoder().setPosition(0), this).withName("Intake.Rezero");
+    }
+
+    // deploy intake and roller while held, stops roller when released
+    public Command deployAndRollCommand(){
+        return Commands.run(() -> {
+            setIntakeDeployed();
+            smc.setDutyCycle(Constants.IntakeConstants.INTAKE_SPEED);
+        }, this).finallyDo(() -> {
+            smc.setDutyCycle(0);
+            setIntakeHold();
+        }).withName("Intake.DeployAndRoll");
+    }
+
+    // deploy intake and eject while held, stops roller when released
+    public Command backFeedAndRollCommand(){
+        return Commands.run(() -> {
+            setIntakeDeployed();
+            //smc.setDutyCycle(-Constants.IntakeConstants.INTAKE_SPEED);
+        }, this).finallyDo(() -> {
+            smc.setDutyCycle(0);
+            setIntakeHold();
+        }).withName("Intake.BackFeedAndRoll");
+    }
+
+    private void setIntakeStow(){
+        intakePivotController.setPosition(Degrees.of(0));
+    }
+
+    private void setIntakeFeed(){
+        intakePivotController.setPosition(Degrees.of(59));
+    }
+
+    private void setIntakeHold(){
+        intakePivotController.setPosition(Degrees.of(115));
+    }
+
+    private void setIntakeDeployed(){
+        intakePivotController.setPosition(Degrees.of(148));
+    }
+
+    @Override
+    public void periodic(){
+        intake.updateTelemetry();
+        intakePivot.updateTelemetry();
+    }
+
+    @Override
+    public void simulationPeriodic(){
+        intake.simIterate();
+        intakePivot.simIterate();
     }
 }
