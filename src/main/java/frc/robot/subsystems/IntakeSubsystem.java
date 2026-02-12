@@ -33,16 +33,16 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class IntakeSubsystem extends SubsystemBase{
-    private SparkMax rollerController = new SparkMax(Constants.IntakeConstants.kRollerMotorId,MotorType.kBrushless);
+    private SparkMax rollerController = new SparkMax(Constants.IntakeConstants.kRollerMotorId,MotorType.kBrushed);
     private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
         .withControlMode(ControlMode.OPEN_LOOP)
         .withTelemetry("IntakeRollerMotor", TelemetryVerbosity.HIGH)
         .withGearing(new MechanismGearing(GearBox.fromReductionStages(1))) // Direct drive, adjust if geared
-        .withMotorInverted(true)
+        .withMotorInverted(Constants.IntakeConstants.kRollerMotorInverted)
         .withIdleMode(MotorMode.COAST)
         .withStatorCurrentLimit(Amps.of(40));
 
-    private SmartMotorController smc = new SparkWrapper(rollerController,DCMotor.getNEO(1),smcConfig);
+    private SmartMotorController smc = new SparkWrapper(rollerController,DCMotor.getCIM(1),smcConfig);
 
     private final FlyWheelConfig intakeConfig = new FlyWheelConfig(smc)
         .withDiameter(Inches.of(4))
@@ -60,7 +60,7 @@ public class IntakeSubsystem extends SubsystemBase{
         .withTelemetry("IntakePivotMotor", TelemetryVerbosity.HIGH)
         .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 5, 6, 60.0 / 18.0)))
         // .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 5, 60.0 / 18.0, 42)))
-        .withMotorInverted(false)
+        .withMotorInverted(Constants.IntakeConstants.kPivotMotorInverted)
         .withIdleMode(MotorMode.COAST)
         .withSoftLimit(Degrees.of(0), Degrees.of(150))
         .withStatorCurrentLimit(Amps.of(10))

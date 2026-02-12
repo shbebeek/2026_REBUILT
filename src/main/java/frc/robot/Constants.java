@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation3d;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -30,7 +32,9 @@ public final class Constants {
     
     // motor id 12-13
     public static final Integer kRollerMotorId = 12;
+    public static final Boolean kRollerMotorInverted = false;
     public static final Integer kPivotMotorId = 13;
+    public static final Boolean kPivotMotorInverted = false;
   }
 
   public static class HopperConstants {
@@ -38,5 +42,23 @@ public final class Constants {
 
     // motor id 14
     public static final Integer kHopperMotorId = 14;
+    public static final Boolean kHopperMotorInverted = false; // edit inversions when doing configuration
+  }
+
+  public static class FeederConstants {
+    public static final double FEEDER_SPEED = 1.0;
+
+    // motor id 15
+    public static final Integer kFeederMotorId = 15;
+    public static final Boolean kFeederMotorInverted = false;
+  }
+
+  public static class TurretConstants {
+    public static final double MAX_ONE_DIR_FOV = 90; // degrees
+    public static final Translation3d turretTranslation = new Translation3d(-0.205, 0.0, 0.375); // (cranberry)
+
+    // motor id 16
+    public static final Integer kTurretMotorId = 16;
+    public static final Boolean kTurretMotorInverted = false;
   }
 }
