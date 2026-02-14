@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -77,10 +78,13 @@ public final class Constants {
     //motor id 19
     public static final Integer kClimberMotorId = 19;
     public static final Boolean kClimberMotorInverted = false;
+
+    public static final double CLIMBER_MOTOR_UP_PERCENT = 0.8;
   }
 
   public static final class SwerveConstants {
     public static final boolean IS_LIMELIGHT_ENABLED = true;
     // NEED TO CONFIGURE ENCODERS IN SWERVE CONFIG (deploy)
+    public static final double MAX_SPEED = Units.feetToMeters(14.5);
   }
 }
