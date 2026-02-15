@@ -4,8 +4,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.RPM;
+
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -64,6 +70,8 @@ public final class Constants {
     // motor id 17
     public static final Integer kTurretMotorId = 17;
     public static final Boolean kTurretMotorInverted = false;
+
+    public static final Angle TURRET_TOLERANCE = Degrees.of(1);
   }
 
   public static final class ShooterConstants {
@@ -72,6 +80,7 @@ public final class Constants {
     public static final Boolean kTurretMotorInverted = false;
 
     public static final Double kFlywheelDiameter = 4.0;
+    public static final AngularVelocity SHOOTER_TOLERANCE = RPM.of(100);
   }
 
   public static final class ClimberConstants {
@@ -86,5 +95,34 @@ public final class Constants {
     public static final boolean IS_LIMELIGHT_ENABLED = true;
     // NEED TO CONFIGURE ENCODERS IN SWERVE CONFIG (deploy)
     public static final double MAX_SPEED = Units.feetToMeters(14.5);
+  }
+
+  public static enum AimPoints {
+    // TODO: get the tower translations and make getTowerPosition function
+    RED_HUB(new Translation3d(11.938, 4.034536, 1.5748)),
+    RED_OUTPOST(new Translation3d(15.75, 7.25, 0)),
+    RED_FAR_SIDE(new Translation3d(15.75, 0.75, 0)),
+
+    BLUE_HUB(new Translation3d(4.5974, 4.034536, 1.5748)),
+    BLUE_OUTPOST(new Translation3d(0.75,0.75,0)),
+    BLUE_FAR_SIDE(new Translation3d(0.75,7.25,0));
+
+    public final Translation3d value;
+
+    private AimPoints(Translation3d value){
+      this.value = value;
+    }
+
+    public static final Translation3d getAllianceHubPosition(){
+      return DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? RED_HUB.value : BLUE_HUB.value;
+    }
+
+    public static final Translation3d getAllianceOutpostPosition(){
+      return DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? RED_OUTPOST.value : BLUE_OUTPOST.value;
+    }
+
+    public static final Translation3d getAllianceFarSidePosition(){
+      return DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? RED_FAR_SIDE.value : BLUE_FAR_SIDE.value;
+    }
   }
 }
