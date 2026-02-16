@@ -75,7 +75,7 @@ public class TurretSubsystem extends SubsystemBase{
         return turret.setAngle(angle);
     }
 
-    // set angle via suppliers from telemetry (nt)
+    // set angle via suppliers from telemetry (NT)
     public Command setAngleDynamic(Supplier<Angle> turretAngleSupplier){
         return turret.setAngle(turretAngleSupplier);
     }

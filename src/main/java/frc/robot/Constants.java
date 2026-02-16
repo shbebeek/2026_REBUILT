@@ -72,6 +72,7 @@ public final class Constants {
     public static final Boolean kTurretMotorInverted = false;
 
     public static final Angle TURRET_TOLERANCE = Degrees.of(1);
+    public static final Double MAX_TURRET_SPEED = 0.1;
   }
 
   public static final class ShooterConstants {

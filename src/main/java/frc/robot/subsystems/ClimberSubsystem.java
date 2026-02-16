@@ -40,6 +40,10 @@ public class ClimberSubsystem extends SubsystemBase{
         return Commands.run(() -> setClimber(-Constants.ClimberConstants.CLIMBER_MOTOR_UP_PERCENT), this).finallyDo(() -> stop()).withName("Climber.ClimbDown");
     }
 
+    public Command stopMotion(){
+        return Commands.run(() -> stop(), this).withName("Climber.StopMotion");
+    }
+
     @Override
     public void periodic(){
   
