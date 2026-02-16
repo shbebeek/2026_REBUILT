@@ -96,7 +96,7 @@ public class IntakeSubsystem extends SubsystemBase{
     }
 
     // angle intake at a specific angle
-    public Command setpivotAngle(Angle angle){
+    public Command setPivotAngle(Angle angle){
         return intakePivot.setAngle(angle).withName("IntakePivot.SetAngle");
     }
 

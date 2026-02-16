@@ -73,6 +73,9 @@ public final class Constants {
 
     public static final Angle TURRET_TOLERANCE = Degrees.of(1);
     public static final Double MAX_TURRET_SPEED = 0.1;
+
+    // fixed hood angle
+    public static final Integer kHoodAngle = 75;
   }
 
   public static final class ShooterConstants {
