@@ -31,9 +31,11 @@ public class Superstructure extends SubsystemBase{
     private final Trigger isShooterAtSpeed;
     private final Trigger isTurretAtAngle;
     private final Trigger isReadyToShoot;
+    private final Trigger isHoodAtAngle;
 
     private AngularVelocity targetShooterSpeed = RPM.of(0);
     private Angle targetTurretAngle = Degrees.of(0);
+    private Angle targetHoodAngle = Degrees.of(0);
 
     // default aim point is red hub
     private Translation3d aimPoint = Constants.AimPoints.RED_HUB.value;
@@ -57,6 +59,10 @@ public class Superstructure extends SubsystemBase{
             () -> Math.abs(turret.getRawAngle().in(Degrees) - targetTurretAngle.in(Degrees))
             < Constants.TurretConstants.TURRET_TOLERANCE.in(Degrees));
         
+        this.isHoodAtAngle = new Trigger(
+            () -> Math.abs(hood.getAngle().in(Degrees) - targetHoodAngle.in(Degrees))
+            < Constants.TurretConstants.HOOD_TOLERANCE.in(Degrees));
+        
         this.isReadyToShoot = isShooterAtSpeed.and(isTurretAtAngle);
     }
     
@@ -73,21 +79,24 @@ public class Superstructure extends SubsystemBase{
      * @param shooterSpeed Target shooter speed
      * @param turretAngle Target turret angle
      */
-    public Command aimCommand(AngularVelocity shooterSpeed, Angle turretAngle){
+    public Command aimCommand(AngularVelocity shooterSpeed, Angle turretAngle, Angle hoodAngle){
         return Commands.runOnce(() -> {
             targetShooterSpeed = shooterSpeed;
             targetTurretAngle = turretAngle;
+            targetHoodAngle = hoodAngle;
         }).andThen(
             Commands.parallel(
                 // shooter.setSpeed(shooterSpeed).asProxy(),
-                turret.setAngle(turretAngle).asProxy()
+                turret.setAngle(turretAngle).asProxy(),
+                hood.setAngle(hoodAngle).asProxy()
             )
         ).withName("Superstructure.Aim");
     }
 
-    public void setShooterSetpoints(AngularVelocity shooterSpeed, Angle turretAngle){
+    public void setShooterSetpoints(AngularVelocity shooterSpeed, Angle turretAngle, Angle hoodAngle){
         targetShooterSpeed = shooterSpeed;
         targetTurretAngle = turretAngle;
+        targetHoodAngle = hoodAngle;
     }
 
     /**
@@ -97,10 +106,12 @@ public class Superstructure extends SubsystemBase{
      */
     public Command aimDynamicCommand(
             Supplier<AngularVelocity> shooterSpeedSupplier,
+            Supplier<Angle> hoodAngleSupplier,
             Supplier<Angle> turretAngleSupplier){
         return Commands.parallel(
             shooter.setSpeedDynamic(shooterSpeedSupplier).asProxy(),
-            turret.setAngleDynamic(turretAngleSupplier).asProxy()
+            turret.setAngleDynamic(turretAngleSupplier).asProxy(),
+            hood.setAngleDynamic(hoodAngleSupplier).asProxy()
         ).withName("Superstructure.AimDynamic");
     }
 
@@ -110,8 +121,8 @@ public class Superstructure extends SubsystemBase{
     }
 
     // aims and waits until ready - combines aim and wait
-    public Command aimAndWaitCommand(AngularVelocity shooterSpeed, Angle turretAngle){
-        return aimDynamicCommand(() -> shooterSpeed, () -> turretAngle).andThen(waitUntilReadyCommand()).withName("Superstructure.AimAndWait");
+    public Command aimAndWaitCommand(AngularVelocity shooterSpeed, Angle hoodAngle, Angle turretAngle){
+        return aimDynamicCommand(() -> shooterSpeed, () -> hoodAngle, () -> turretAngle).andThen(waitUntilReadyCommand()).withName("Superstructure.AimAndWait");
     }
 
     // manual turret control
@@ -144,12 +155,20 @@ public class Superstructure extends SubsystemBase{
         return turret.getRawAngle();
     }
 
+    public Angle getHoodAngle(){
+        return hood.getAngle();
+    }
+
     public AngularVelocity getTargetShooterSpeed(){
         return targetShooterSpeed;
     }
 
     public Angle getTargetTurretAngle(){
         return targetTurretAngle;
+    }
+
+    public Angle getTargetHoodAngle(){
+        return targetHoodAngle;
     }
 
     public Translation3d getAimPoint(){
@@ -244,7 +263,7 @@ public class Superstructure extends SubsystemBase{
     }
 
     // re-zero both intake pivot and turret
-    public Command rezeroIntakePiotAndTurretCommand(){
+    public Command rezeroIntakePivotAndTurretCommand(){
         return Commands.parallel(
             turret.rezero().withName("Superstructure.rezeroTurret"),
             intake.rezero().withName("Superstructure.rezeroIntakePivot")
@@ -268,9 +287,12 @@ public class Superstructure extends SubsystemBase{
         String turretOut = "T:" + isTurretAtAngle.getAsBoolean() + "(" + Math.round(turret.getRawAngle().in(Degrees))
             + "/" + Math.round(targetTurretAngle.in(Degrees)) + ")";
 
+        String hoodOut = "H:" + isHoodAtAngle.getAsBoolean() + "(" + Math.round(hood.getAngle().in(Degrees))
+            + "/" + Math.round(targetHoodAngle.in(Degrees)) + ")";
+
         String readyOut = "R:" + isReadyToShoot.getAsBoolean();
 
-        System.out.println(shooterOut + " " + turretOut + " " + readyOut);
+        System.out.println(shooterOut + " " + turretOut + " " + hoodOut + " " + readyOut);
     }
 
     // not entirely sure of the use of this function but i'm leaving it in here
