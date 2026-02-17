@@ -101,6 +101,13 @@ public final class Constants {
     public static final double MAX_SPEED = Units.feetToMeters(14.5);
   }
 
+  public static final class PracticeClimberConstants {
+    public static final Integer kClimberMotorId = 19; ///?????
+    public static final Boolean kClimberMotorIsInverted = false;
+    public static final Double kClimbSpeed = 1.0;
+    public static final Double kFinalClimbPosition = 180.0; // adjust as need to mean motor has climbed fully
+  }
+
   public static enum AimPoints {
     // TODO: get the tower translations and make getTowerPosition function
     RED_HUB(new Translation3d(11.938, 4.034536, 1.5748)),
