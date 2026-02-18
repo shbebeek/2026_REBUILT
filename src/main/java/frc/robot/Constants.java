@@ -108,6 +108,14 @@ public final class Constants {
     public static final Double kFinalClimbPosition = 180.0; // adjust as need to mean motor has climbed fully
   }
 
+  public static final class PracticeIntakeConstants {
+    public static final Integer kRollerMotorId = 10;
+    public static final Integer kPivotMotorId = 11;
+    public static final Boolean kRollerMotorIsInverted = false;
+    public static final Double kIntakeSpeed = 1.0;
+    public static final Double kDeployMotorRotations = 0.5; //adjust as needed for pivot range of motion
+  }
+
   public static enum AimPoints {
     // TODO: get the tower translations and make getTowerPosition function
     RED_HUB(new Translation3d(11.938, 4.034536, 1.5748)),
