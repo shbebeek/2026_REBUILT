@@ -4,8 +4,12 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.Autos;
+import frc.robot.controls.DriverControls;
+import frc.robot.controls.OperatorControls;
+import frc.robot.controls.PoseControls;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
@@ -19,6 +23,7 @@ import frc.robot.subsystems.TurretSubsystem;
 import java.io.File;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -87,7 +92,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Do Nothing", Commands.none());
 
     // add a simple auto option to have the robot drive backward for 1 second then stop
-    autoChooser.addOption("Drive Forward", drivebase.driveBackwards().withTimeout(10));
+    autoChooser.addOption("Drive Backward", drivebase.driveBackwards().withTimeout(1));
     
     // put autoChooser on SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -95,6 +100,30 @@ public class RobotContainer {
 
   private void configureBindings(){
     // set up controllers
-    DriverControls.configure(ControllerConstants.)
+    DriverControls.configure(Constants.ControllerConstants.kDriverControllerPort, drivebase, superstructure);
+    OperatorControls.configure(Constants.ControllerConstants.kOperatorControllerPort, drivebase, superstructure);
+    PoseControls.configure(Constants.ControllerConstants.kPoseControllerPort,drivebase);
+  }
+
+  private void buildNamedAutoCommands(){
+    // add any auto commands to NamedCommands here
+    NamedCommands.registerCommand("driveBackwards", drivebase.driveBackwards().withTimeout(1).withName("Auto.driveBackwards"));
+    NamedCommands.registerCommand("driveForwards", drivebase.driveForward().withTimeout(1).withName("Auto.driveForwards"));
+  
+    
+
+
+
+    // without superstructure
+    NamedCommands.registerCommand("deployIntake", intake.deployAndRollCommand().withName("Auto.deployIntake"));
+    NamedCommands.registerCommand("reverseIntake", intake.backFeedAndRollCommand().withName("Auto.reverseIntake"));
+
+    NamedCommands.registerCommand("hopperFeed", hopper.feedCommand().withName("Auto.hopperFeed"));
+    NamedCommands.registerCommand("hopperReverse", hopper.backFeedCommand().withName("Auto.hopperEject"));
+
+    NamedCommands.registerCommand("feederFeed", feeder.feedCommand().withName("Auto.feederFeed"));
+
+    NamedCommands.registerCommand("turretCenter", turret.center().withName("Auto.turretCenter"));
+    NamedCommands.registerCommand("reverseIntake", intake.backFeedAndRollCommand().withName("Auto.reverseIntake"));
   }
 }

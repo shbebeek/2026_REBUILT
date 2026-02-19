@@ -59,9 +59,22 @@ public class PoseControls {
             if(leftX != 0 || leftY != 0){
                 // -leftY = forward motion, leftX = strafe right
                 // apply alliance multiplier to make controls relative to driver station
-                // TODO: add adjustTargetTranslation and adjustTargetRotation
+                adjustTargetTranslation(
+                    -leftY * Constants.VisionConstants.TRANSLATION_SPEED * allianceMultiplier, // forward/back -> x
+                    -leftX * Constants.VisionConstants.TRANSLATION_SPEED * allianceMultiplier); // left/right -> y
             }
-        });
+            if(rightX != 0){
+                adjustTargetRotation(-rightX * Constants.VisionConstants.ROTATION_SPEED);
+            }
+
+            updateFieldPose(drivetrain);
+        }).ignoringDisable(true).withName("PoseControls.Update").schedule();
+
+        // Y button: reset target pose to robot's current position
+        controller.back().onTrue(Commands.runOnce(() -> {
+            targetPose = drivetrain.getPose();
+            updateFieldPose(drivetrain);
+        }).ignoringDisable(true));
     }
 
     /**
@@ -117,5 +130,15 @@ public class PoseControls {
      */
     public static void setTargetPose(Pose2d pose){
         targetPose = pose;
+    }
+
+    /**
+     * target pose and update field visualization
+     * @param pose new target pose
+     * @param drivetrain swerve subsystem for updating field
+     */
+    public static void setTargetPose(Pose2d pose, SwerveSubsystem drivetrain){
+        targetPose = pose;
+        updateFieldPose(drivetrain);
     }
 }
