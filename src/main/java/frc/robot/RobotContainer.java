@@ -18,9 +18,13 @@ import frc.robot.subsystems.TurretSubsystem;
 
 import java.io.File;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -62,6 +66,35 @@ public class RobotContainer {
     onAllianceChanged(getAlliance());
 
     // set up trigger to detect alliance changes
-    new Trigger(() -> getAlliance() != currentAlliance).onTrue(Commands.runOnce(() -> onAllianceChanged(getAlliance())).ignoreDisable(true);
+    new Trigger(() -> getAlliance() != currentAlliance)
+      .onTrue(Commands.runOnce(() -> onAllianceChanged(getAlliance())).ignoreDisable(true);
+    
+    // triggers for auto aim/pass poses
+    new Trigger(() -> isInAllianceZone())
+      .onChange(Commands.runOnce(() -> onZoneChanged()).ignoredDisable(true));
+    
+    new Trigger(() -> isOnAllianceOutpostSide())
+      .onChange(Commands.runOnce(() -> onZoneChanged()).ignoringDisable(true));
+      
+    if(!Robot.isReal() || true){
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
+
+    // have autoChooser pull all PathPlanner autos as options
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    // set default auto (do nothing)
+    autoChooser.setDefaultOption("Do Nothing", Commands.none());
+
+    // add a simple auto option to have the robot drive backward for 1 second then stop
+    autoChooser.addOption("Drive Forward", drivebase.driveBackwards().withTimeout(10));
+    
+    // put autoChooser on SmartDashboard
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+  }
+
+  private void configureBindings(){
+    // set up controllers
+    DriverControls.configure(ControllerConstants.)
   }
 }

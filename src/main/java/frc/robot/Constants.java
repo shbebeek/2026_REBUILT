@@ -130,4 +130,18 @@ public final class Constants {
       return DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? RED_FAR_SIDE.value : BLUE_FAR_SIDE.value;
     }
   }
+
+  public static final class ControllerConstants {
+    public static final double DEADBAND = 0.1;
+
+    public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
+    public static final int kPoseControllerPort = 2;
+  }
+
+  public static final class VisionConstants {
+    // movement speeds for adjusting target pose
+    public static final double TRANSLATION_SPEED = 0.05; // meters per periodic cycle
+    public static final double ROTATION_SPEED = 2.0; // degrees per periodic cycle
+  }
 }

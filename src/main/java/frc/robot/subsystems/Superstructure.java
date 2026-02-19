@@ -66,12 +66,11 @@ public class Superstructure extends SubsystemBase{
         this.isReadyToShoot = isShooterAtSpeed.and(isTurretAtAngle);
     }
     
-    // stops all mechanisms from moving
+    // stops all shooting mechanisms from moving
     public Command stopAllShootingCommand(){
         return Commands.parallel(
             shooter.stop().asProxy(),
-            turret.set(0).asProxy(),
-            climber.stopMotion().asProxy()).withName("Superstructure.StopAll");
+            turret.set(0).asProxy()).withName("Superstructure.StopAllShooting");
     }
 
     /**
@@ -189,7 +188,7 @@ public class Superstructure extends SubsystemBase{
 
     // run intake while held
     public Command intakeCommand(){
-        return intake.intakeCommand().withName("Superstruture.Intake");
+        return intake.intakeCommand().withName("Superstructure.Intake");
     }
 
     // eject while held
