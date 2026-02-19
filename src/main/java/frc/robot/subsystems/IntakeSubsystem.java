@@ -127,6 +127,10 @@ public class IntakeSubsystem extends SubsystemBase{
         }).withName("Intake.BackFeedAndRoll");
     }
 
+    public Command stowIntake() {
+        return Commands.runOnce(() -> setIntakeStow(), this).withName("IntakeSubsystem.Stow Intake");
+    }
+
     private void setIntakeStow(){
         intakePivotController.setPosition(Degrees.of(0));
     }

@@ -296,4 +296,12 @@ public class Superstructure extends SubsystemBase{
     public LinearVelocity getTangentialVelocity(){
         return shooter.getTangentialVelocity();
     }
+
+    // Practice commands
+    public Command prepForClimbCommand () {
+        return Commands.parallel(
+            intake.stowIntake(),
+            hood.stow()
+        ).withName("Superstructure.intake and shoot");
+    }
 }
