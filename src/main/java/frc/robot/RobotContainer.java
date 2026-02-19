@@ -19,8 +19,10 @@ import frc.robot.subsystems.TurretSubsystem;
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -46,4 +48,20 @@ public class RobotContainer {
   private final Superstructure superstructure = new Superstructure(intake, hopper, feeder, turret, shooter, climber, hood);
 
   private final SendableChooser<Command> autoChooser;
+
+  // track current alliance for change detection
+  private Alliance currentAlliance = Alliance.Red;
+
+  // contains subsystems, i/o devices, and commands
+  public RobotContainer(){
+    // configure trigger bindings
+    configureBindings();
+    buildNamedAutoCommands();
+
+    // intialize alliance (default to red if not present)
+    onAllianceChanged(getAlliance());
+
+    // set up trigger to detect alliance changes
+    new Trigger(() -> getAlliance() != currentAlliance).onTrue(Commands.runOnce(() -> onAllianceChanged(getAlliance())).ignoreDisable(true);
+  }
 }
