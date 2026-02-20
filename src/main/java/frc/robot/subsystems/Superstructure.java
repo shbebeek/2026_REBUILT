@@ -85,7 +85,7 @@ public class Superstructure extends SubsystemBase{
             targetHoodAngle = hoodAngle;
         }).andThen(
             Commands.parallel(
-                // shooter.setSpeed(shooterSpeed).asProxy(),
+                shooter.setSpeed(shooterSpeed).asProxy(),
                 turret.setAngle(turretAngle).asProxy(),
                 hood.setAngle(hoodAngle).asProxy()
             )
@@ -119,9 +119,14 @@ public class Superstructure extends SubsystemBase{
          return Commands.waitUntil(isReadyToShoot).withName("Superstructure.WaitUntilReady");
     }
 
-    // aims and waits until ready - combines aim and wait
+    // aims and waits until ready - combines aimDynamic and wait
+    public Command aimDynamicAndWaitCommand(AngularVelocity shooterSpeed, Angle hoodAngle, Angle turretAngle){
+        return aimDynamicCommand(() -> shooterSpeed, () -> hoodAngle, () -> turretAngle).andThen(waitUntilReadyCommand()).withName("Superstructure.AimDynamicAndWait");
+    }
+
+    // auto aim and wait command
     public Command aimAndWaitCommand(AngularVelocity shooterSpeed, Angle hoodAngle, Angle turretAngle){
-        return aimDynamicCommand(() -> shooterSpeed, () -> hoodAngle, () -> turretAngle).andThen(waitUntilReadyCommand()).withName("Superstructure.AimAndWait");
+        return aimCommand(getTargetShooterSpeed(), getTargetTurretAngle(), getTargetHoodAngle()).andThen(waitUntilReadyCommand()).withName("Superstructure.AimAndWait");
     }
 
     // manual turret control
@@ -222,6 +227,7 @@ public class Superstructure extends SubsystemBase{
         ).withName("Superstructure.FullFeed");
     }
 
+    // full eject while held
     public Command ejectAllCommand(){
         return Commands.parallel(
             hopper.backFeedCommand().asProxy(),
@@ -230,7 +236,7 @@ public class Superstructure extends SubsystemBase{
     }
 
     public Command intakeBounceCommand(){
-        return Commands.sequence(
+        return Commands.repeatingSequence(
             Commands.runOnce(() -> intake.setPivotAngle(Degrees.of(115)).asProxy().withName("Superstructure.IntakeBounce.Deploy")),
             Commands.waitSeconds(0.5),
             Commands.runOnce(() -> intake.setPivotAngle(Degrees.of(59)).asProxy().withName("Superstructure.IntakeBounce.Feed")),
@@ -240,9 +246,9 @@ public class Superstructure extends SubsystemBase{
 
     public Command stopFeedingAllCommand(){
         return Commands.parallel(
+            //intake.deployAndRollCommand().asProxy(),
             hopper.stopCommand().asProxy(),
-            feeder.stopCommand().asProxy(),
-            intake.deployAndRollCommand().asProxy()
+            feeder.stopCommand().asProxy()
         ).withName("Superstructure.FullStopFeeding");
     }
 
@@ -254,6 +260,11 @@ public class Superstructure extends SubsystemBase{
     // deploy and roll while held
     public Command setIntakeDeployAndRoll(){
         return intake.deployAndRollCommand().withName("Superstructure.SetIntakeDeployAndRoll");
+    }
+
+    // stow intake
+    public Command setIntakeStow(){
+        return intake.stowIntake().withName("Superstructure.SetIntakeStow");
     }
 
     // shoot - spins up shooter

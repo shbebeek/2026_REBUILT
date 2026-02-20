@@ -4,9 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.Constants;
-import frc.robot.Constants.ControllerConstants;
-import frc.robot.commands.Autos;
+import frc.robot.commands.ShootOnTheMoveCommand;
 import frc.robot.controls.DriverControls;
 import frc.robot.controls.OperatorControls;
 import frc.robot.controls.PoseControls;
@@ -19,12 +17,20 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import swervelib.SwerveDrive;
+
+import static edu.wpi.first.units.Units.Inches;
 
 import java.io.File;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,7 +38,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -72,11 +77,11 @@ public class RobotContainer {
 
     // set up trigger to detect alliance changes
     new Trigger(() -> getAlliance() != currentAlliance)
-      .onTrue(Commands.runOnce(() -> onAllianceChanged(getAlliance())).ignoreDisable(true);
+      .onTrue(Commands.runOnce(() -> onAllianceChanged(getAlliance())).ignoringDisable(true));
     
     // triggers for auto aim/pass poses
     new Trigger(() -> isInAllianceZone())
-      .onChange(Commands.runOnce(() -> onZoneChanged()).ignoredDisable(true));
+      .onChange(Commands.runOnce(() -> onZoneChanged()).ignoringDisable(true));
     
     new Trigger(() -> isOnAllianceOutpostSide())
       .onChange(Commands.runOnce(() -> onZoneChanged()).ignoringDisable(true));
@@ -110,20 +115,111 @@ public class RobotContainer {
     NamedCommands.registerCommand("driveBackwards", drivebase.driveBackwards().withTimeout(1).withName("Auto.driveBackwards"));
     NamedCommands.registerCommand("driveForwards", drivebase.driveForward().withTimeout(1).withName("Auto.driveForwards"));
   
+    NamedCommands.registerCommand("aimShooting", superstructure.aimCommand(superstructure.getTargetShooterSpeed(), superstructure.getTargetTurretAngle(), superstructure.getTargetHoodAngle()).withName("Auto.AimCommand"));
+    NamedCommands.registerCommand("stopShooting", superstructure.stopAllShootingCommand().withName("Auto.StopShooting"));
+    NamedCommands.registerCommand("aimDynamicShooting", superstructure.aimDynamicCommand(() -> shooter.getSpeed(), () -> turret.getRawAngle(), () -> hood.getAngle()));
     
+    NamedCommands.registerCommand("feedShooter", superstructure.feedAllCommand().withName("Auto.FeedShooter"));
+    NamedCommands.registerCommand("stopFeed", superstructure.stopFeedingAllCommand().withName("Auto.StopFeed"));
 
+    NamedCommands.registerCommand("climbUp", superstructure.moveClimberUp().withName("Auto.ClimbUp"));
+    NamedCommands.registerCommand("climbDown", superstructure.moveClimberDown().withName("Auto.ClimbDown"));
+    
+    NamedCommands.registerCommand("deployIntake", superstructure.setIntakeDeployAndRoll().withName("Auto.DeployIntake"));
+    NamedCommands.registerCommand("retractIntake", superstructure.setIntakeStow().withName("Auto.StowIntake"));
+    NamedCommands.registerCommand("bounceIntake", superstructure.intakeBounceCommand().withName("Auto.BounceIntake"));
+    NamedCommands.registerCommand("eject", superstructure.ejectAllCommand().withName("Auto.Eject"));
 
+    NamedCommands.registerCommand("centerTurret", superstructure.setTurretForward().withName("Auto.CenterTurret"));
+    NamedCommands.registerCommand("manualShoot", superstructure.shootCommand().withName("Auto.ManualShoot"));
 
-    // without superstructure
-    NamedCommands.registerCommand("deployIntake", intake.deployAndRollCommand().withName("Auto.deployIntake"));
-    NamedCommands.registerCommand("reverseIntake", intake.backFeedAndRollCommand().withName("Auto.reverseIntake"));
+    NamedCommands.registerCommand("shootOnTheMove", new ShootOnTheMoveCommand(drivebase,superstructure,() -> superstructure.getAimPoint()).ignoringDisable(true).withName("Auto.Eject"));
+  }
 
-    NamedCommands.registerCommand("hopperFeed", hopper.feedCommand().withName("Auto.hopperFeed"));
-    NamedCommands.registerCommand("hopperReverse", hopper.backFeedCommand().withName("Auto.hopperEject"));
+  public Command getAutonomousCommand(){
+    return autoChooser.getSelected();
+  }
 
-    NamedCommands.registerCommand("feederFeed", feeder.feedCommand().withName("Auto.feederFeed"));
+  public SwerveDrive getSwerveDrive(){
+    return drivebase.getSwerveDrive();
+  }
 
-    NamedCommands.registerCommand("turretCenter", turret.center().withName("Auto.turretCenter"));
-    NamedCommands.registerCommand("reverseIntake", intake.backFeedAndRollCommand().withName("Auto.reverseIntake"));
+  public Pose2d getRobotPose(){
+    return drivebase.getPose();
+  }
+
+  public Pose3d getAimDirection(){
+    // apply robot heading first, then turret/hood rotation on top
+    Pose3d shooterPose = superstructure.getShooterPose();
+
+    var pose = drivebase.getPose3d().plus(new Transform3d(
+      shooterPose.getTranslation(), shooterPose.getRotation()
+    ));
+
+    return pose;
+  }
+
+  public Translation3d getAimPoint(){
+    return superstructure.getAimPoint();
+  }
+
+  public void setAimPoint(Translation3d aimPoint){
+    superstructure.setAimPoint(aimPoint);
+  }
+
+  private Alliance getAlliance(){
+    return DriverStation.getAlliance().orElse(Alliance.Red);
+  }
+
+  private boolean isInAllianceZone(){
+    Alliance alliance = getAlliance();
+    Distance blueZone = Inches.of(182);
+    Distance redZone = Inches.of(469);
+
+    if(alliance == Alliance.Blue && drivebase.getPose().getMeasureX().lt(blueZone)){
+      return true;
+    }else if(alliance == Alliance.Red && drivebase.getPose().getMeasureX().gt(redZone)){
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean isOnAllianceOutpostSide(){
+    Alliance alliance = getAlliance();
+    Distance midline = Inches.of(158.84375);
+
+    if(alliance == Alliance.Blue && drivebase.getPose().getMeasureY().lt(midline)){
+      return true;
+    }else if(alliance == Alliance.Red && drivebase.getPose().getMeasureY().gt(midline)){
+      return true;
+    }
+
+    return false;
+  }
+
+  private void onZoneChanged(){
+    if(isInAllianceZone()){
+      superstructure.setAimPoint(Constants.AimPoints.getAllianceHubPosition());
+    }else{
+      if(isOnAllianceOutpostSide()){
+        superstructure.setAimPoint(Constants.AimPoints.getAllianceOutpostPosition());
+      }else{
+        superstructure.setAimPoint(Constants.AimPoints.getAllianceFarSidePosition());
+      }
+    }
+  }
+
+  private void onAllianceChanged(Alliance alliance){
+    currentAlliance = alliance;
+
+    // update aim point based on alliance
+    if(alliance == Alliance.Blue){
+      superstructure.setAimPoint(Constants.AimPoints.BLUE_HUB.value);
+    }else{
+      superstructure.setAimPoint(Constants.AimPoints.RED_HUB.value);
+    }
+
+    System.out.println("Alliance changed to: " + alliance);
   }
 }
