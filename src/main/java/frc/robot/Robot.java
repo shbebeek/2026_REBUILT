@@ -4,13 +4,21 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.CommandsLogging;
@@ -26,6 +34,8 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer m_robotContainer;
   private SimulatedArena arena;
+
+  private SwerveDriveSimulation swerveDriveSimulation;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -149,6 +159,30 @@ public class Robot extends LoggedRobot {
     SimulatedArena.getInstance().shutDown();
     SimulatedArena.overrideInstance(new Arena2026Rebuilt());
     arena = SimulatedArena.getInstance();
+
+    // Create and configure a drivetrain simulation configuration
+    final DriveTrainSimulationConfig driveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+      // Specify gyro type (for realistic gyro drifting and error simulation)
+      .withGyro(COTS.ofPigeon2())
+      // Specify swerve module (for realistic swerve dynamics)
+      .withSwerveModule(COTS.ofMark4i(
+        DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
+        DCMotor.getKrakenX60(1), // Steer motor is a Kraken X60
+        COTS.WHEELS.COLSONS.cof, // Use the COF for Colson Wheels
+        2)) // L2 Gear ratio
+      // Configures the track length and track width (spacing between swerve modules)
+      .withTrackLengthTrackWidth(Inches.of(27), Inches.of(27))
+      // Configures the bumper size (dimensions of the robot bumper)
+      .withBumperSize(Inches.of(33), Inches.of(33));
+
+    /* Create a swerve drive simulation */
+    this.swerveDriveSimulation = new SwerveDriveSimulation(
+        // Specify Configuration
+        driveTrainSimulationConfig,
+        // Specify starting pose
+        new Pose2d(3, 3, new Rotation2d())
+    );
+
     arena.addDriveTrainSimulation(m_robotContainer.getSwerveDrive().getMapleSimDrive().get());
   }
 

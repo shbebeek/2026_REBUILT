@@ -738,6 +738,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle) {
     Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
+    
     return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
         scaledInputs.getY(),
         angle.getRadians(),
