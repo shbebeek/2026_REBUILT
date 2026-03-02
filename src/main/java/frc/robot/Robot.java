@@ -183,7 +183,7 @@ public class Robot extends LoggedRobot {
         new Pose2d(3, 3, new Rotation2d())
     );
 
-    arena.addDriveTrainSimulation(m_robotContainer.getSwerveDrive().getMapleSimDrive().get());
+    arena.addDriveTrainSimulation(swerveDriveSimulation);
   }
 
   /** This function is called periodically whilst in simulation. */

@@ -29,6 +29,8 @@ public final class Constants {
   public static class DriveConstants {
     public static final double DRIVE_SPEED = 1.0;
 
+    // TODO: see if adjustment (2.5 inches) need to be made for the distance in swerve config
+
     // motor ids 1-8
     public static final int[] kDriverIds = new int[8];
     // cancoder ids 9-12
