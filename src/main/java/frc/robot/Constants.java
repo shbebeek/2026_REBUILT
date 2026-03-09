@@ -29,8 +29,6 @@ public final class Constants {
   public static class DriveConstants {
     public static final double DRIVE_SPEED = 1.0;
 
-    // TODO: see if adjustment (2.5 inches) need to be made for the distance in swerve config
-
     // motor ids 1-8
     public static final int[] kDriverIds = new int[8];
     // cancoder ids 9-12
@@ -40,7 +38,7 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_SPEED = 1.0;
+    public static final double INTAKE_SPEED = 0.1;
     
     // motor id 13-14
     public static final Integer kRollerMotorId = 13;
@@ -50,7 +48,7 @@ public final class Constants {
   }
 
   public static class HopperConstants {
-    public static final double HOPPER_SPEED = 1.0;
+    public static final double HOPPER_SPEED = 0.1;
 
     // motor id 15
     public static final Integer kHopperMotorId = 15;
@@ -58,7 +56,7 @@ public final class Constants {
   }
 
   public static class FeederConstants {
-    public static final double FEEDER_SPEED = 1.0;
+    public static final double FEEDER_SPEED = 0.1;
 
     // motor id 16
     public static final Integer kFeederMotorId = 16;
@@ -74,7 +72,7 @@ public final class Constants {
     public static final Boolean kTurretMotorInverted = false;
 
     public static final Angle TURRET_TOLERANCE = Degrees.of(1);
-    public static final Double MAX_TURRET_SPEED = 0.1;
+    public static final Double MAX_TURRET_SPEED = 0.05;
 
     // fixed hood angle
     public static final Integer kHoodAngle = 75;
@@ -88,6 +86,8 @@ public final class Constants {
 
     public static final Double kFlywheelDiameter = 4.0;
     public static final AngularVelocity SHOOTER_TOLERANCE = RPM.of(100);
+
+    public static final int SHOOTER_SPEED = 2000; // this is set to 5500 in main
   }
 
   public static final class ClimberConstants {

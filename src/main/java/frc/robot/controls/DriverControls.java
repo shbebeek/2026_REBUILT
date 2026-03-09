@@ -98,15 +98,18 @@ public class DriverControls {
                 )
             );
         }else{
-            controller.start().onTrue(superstructure.rezeroIntakePivotAndTurretCommand().ignoringDisable(true));
+            //controller.start().onTrue(superstructure.rezeroIntakePivotAndTurretCommand().ignoringDisable(true));
 
             controller.leftBumper().whileTrue(superstructure.setIntakeDeployAndRoll().withName("DriverControls.DeployIntake"));
             controller.b().whileTrue(superstructure.ejectAllCommand().finallyDo(() -> superstructure.stopFeedingAllCommand().schedule()));
             
-            controller.rightBumper().toggleOnTrue(new ShootOnTheMoveCommand(drivetrain, superstructure, () -> superstructure.getAimPoint())
+            /*controller.rightBumper().toggleOnTrue(new ShootOnTheMoveCommand(drivetrain, superstructure, () -> superstructure.getAimPoint())
                 .ignoringDisable(true)
                 .withName("DriverControls.ShootOnTheMove"));
+            */
 
+            controller.x().whileTrue(superstructure.shootCommand().finallyDo(() -> superstructure.stopAllShootingCommand()));
+            
             controller.leftTrigger().whileTrue(superstructure.aimCommand(superstructure.getTargetShooterSpeed(), superstructure.getTargetTurretAngle(), superstructure.getTargetHoodAngle()).finallyDo(() -> superstructure.stopAllShootingCommand().schedule()));
 
             controller.rightTrigger().whileTrue(superstructure.feedAllCommand().finallyDo(() -> superstructure.stopFeedingAllCommand().schedule()));
@@ -117,8 +120,8 @@ public class DriverControls {
 
             controller.povDown().onTrue(Commands.runOnce(drivetrain::zeroGyro));
 
-            controller.y().whileTrue(superstructure.moveClimberDown());
-            controller.a().whileTrue(superstructure.moveClimberUp());
+            //controller.y().whileTrue(superstructure.moveClimberDown());
+            //controller.a().whileTrue(superstructure.moveClimberUp());
             // TODO: code in the vision for auto-targeting to tower (button x)
         }
     }
