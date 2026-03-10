@@ -150,6 +150,10 @@ public class Superstructure extends SubsystemBase{
         return turret.set(-Constants.TurretConstants.MAX_TURRET_SPEED).withName("Superstructure.RotateTurretRight");
     }
 
+    public Command stopTurret(){
+        return turret.set(0).withName("Superstructure.StopTurret");
+    }
+
     // getters for current state
     public AngularVelocity getShooterSpeed(){
         return shooter.getSpeed();

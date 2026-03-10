@@ -42,7 +42,7 @@ public class IntakeSubsystem extends SubsystemBase{
         .withIdleMode(MotorMode.COAST)
         .withStatorCurrentLimit(Amps.of(40));
 
-    private SmartMotorController smc = new SparkWrapper(rollerController,DCMotor.getCIM(1),smcConfig);
+    private SmartMotorController smc = new SparkWrapper(rollerController,DCMotor.getNEO(1),smcConfig);
 
     private final FlyWheelConfig intakeConfig = new FlyWheelConfig(smc)
         .withDiameter(Inches.of(4))

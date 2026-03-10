@@ -38,7 +38,8 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_SPEED = 0.1;
+    public static final double INTAKE_SPEED = 0.75
+    ;
     
     // motor id 13-14
     public static final Integer kRollerMotorId = 13;
@@ -48,7 +49,7 @@ public final class Constants {
   }
 
   public static class HopperConstants {
-    public static final double HOPPER_SPEED = 0.1;
+    public static final double HOPPER_SPEED = 0.75;
 
     // motor id 15
     public static final Integer kHopperMotorId = 15;
@@ -56,7 +57,7 @@ public final class Constants {
   }
 
   public static class FeederConstants {
-    public static final double FEEDER_SPEED = 0.1;
+    public static final double FEEDER_SPEED = 0.75;
 
     // motor id 16
     public static final Integer kFeederMotorId = 16;

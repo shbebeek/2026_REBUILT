@@ -47,7 +47,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // TODO: configure the swerve modules and get the deploy folder
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
   private final IntakeSubsystem intake = new IntakeSubsystem();
@@ -91,7 +90,7 @@ public class RobotContainer {
     }
 
     // have autoChooser pull all PathPlanner autos as options
-    autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = new SendableChooser<>();
 
     // set default auto (do nothing)
     autoChooser.setDefaultOption("Do Nothing", Commands.none());
@@ -138,6 +137,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand(){
     return autoChooser.getSelected();
+    // return new PathPlannerAuto("Basic Auto");
   }
 
   public SwerveDrive getSwerveDrive(){

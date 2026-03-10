@@ -114,10 +114,11 @@ public class DriverControls {
 
             controller.rightTrigger().whileTrue(superstructure.feedAllCommand().finallyDo(() -> superstructure.stopFeedingAllCommand().schedule()));
 
-            controller.povUp().onTrue(superstructure.setTurretForward().withName("DriverControls.SetTurretForward"));
-            controller.povLeft().whileTrue(superstructure.rotateTurretLeft());
-            controller.povRight().whileTrue(superstructure.rotateTurretRight());
+            controller.povUp().onTrue(superstructure.setTurretForward().finallyDo(() -> superstructure.stopTurret().schedule()).withName("DriverControls.SetTurretForward"));
+            controller.povLeft().whileTrue(superstructure.rotateTurretLeft().finallyDo(() -> superstructure.stopTurret().schedule()));
+            controller.povRight().whileTrue(superstructure.rotateTurretRight().finallyDo(() -> superstructure.stopTurret().schedule()));
 
+            
             controller.povDown().onTrue(Commands.runOnce(drivetrain::zeroGyro));
 
             //controller.y().whileTrue(superstructure.moveClimberDown());
