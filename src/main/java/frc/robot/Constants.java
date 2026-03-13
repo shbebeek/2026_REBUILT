@@ -38,18 +38,17 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_SPEED = 0.75
-    ;
+    public static final double INTAKE_SPEED = 0.50;
     
     // motor id 13-14
     public static final Integer kRollerMotorId = 13;
     public static final Boolean kRollerMotorInverted = false;
     public static final Integer kPivotMotorId = 14;
-    public static final Boolean kPivotMotorInverted = false;
+    public static final Boolean kPivotMotorInverted = true;
   }
 
   public static class HopperConstants {
-    public static final double HOPPER_SPEED = 0.75;
+    public static final double HOPPER_SPEED = 0.50;
 
     // motor id 15
     public static final Integer kHopperMotorId = 15;

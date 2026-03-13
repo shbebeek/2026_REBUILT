@@ -28,10 +28,10 @@ public class FeederSubsystem extends SubsystemBase{
 
     private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
         .withControlMode(ControlMode.OPEN_LOOP)
-        .withTelemetry("KickerMotor",TelemetryVerbosity.HIGH)
+        .withTelemetry("FeederMotor",TelemetryVerbosity.HIGH)
         .withGearing(new MechanismGearing(GearBox.fromReductionStages(4))) // 4:1 gear reduction
         .withMotorInverted(Constants.HopperConstants.kHopperMotorInverted)
-        .withIdleMode(MotorMode.BRAKE)
+        .withIdleMode(MotorMode.COAST)
         .withStatorCurrentLimit(Amps.of(20));
     
     private SmartMotorController smc = new SparkWrapper(feederController,DCMotor.getNEO(1),smcConfig);
@@ -51,7 +51,7 @@ public class FeederSubsystem extends SubsystemBase{
 
     // run feeder while held, stop when released
     public Command feedCommand(){
-        return feeder.set(Constants.FeederConstants.FEEDER_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Feeder.Feed");
+        return feeder.set(-Constants.FeederConstants.FEEDER_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Feeder.Feed");
     }
 
     // stop feeder

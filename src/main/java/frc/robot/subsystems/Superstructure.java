@@ -195,9 +195,26 @@ public class Superstructure extends SubsystemBase{
         );
     }
 
-    // run intake while held
+    // run intake roller (need stopIntake)
     public Command intakeCommand(){
         return intake.intakeCommand().withName("Superstructure.Intake");
+    }
+
+    public Command deployIntakeCommand(){
+        return intake.deployIntake().withName("Superstructure.DeployIntake");
+    }
+
+    public Command returnIntakeCommand(){
+        return intake.returnIntake().withName("Superstructure.ReturnIntake");
+    }
+
+    public Command stopIntakePivot(){
+        return intake.stopPivot().withName("Superstructure.StopIntakePivot");
+    }
+
+    // stop intake
+    public Command stopIntakeCommand(){
+        return intake.stopIntake().withName("Superstructure.StopIntake");
     }
 
     // eject while held
@@ -274,6 +291,11 @@ public class Superstructure extends SubsystemBase{
     // shoot - spins up shooter
     public Command shootCommand(){
         return shooter.spinUp().withName("Superstructure.Shoot");
+    }
+
+    // shoot slow
+    public Command shootSlowCommand(){
+        return shooter.spinUpSlow().withName("Superstructure.ShootSlow");
     }
 
     // re-zero both intake pivot and turret

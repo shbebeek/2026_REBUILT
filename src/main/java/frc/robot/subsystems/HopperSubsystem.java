@@ -28,14 +28,14 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class HopperSubsystem extends SubsystemBase {
-  private SparkMax hopperController = new SparkMax(Constants.HopperConstants.kHopperMotorId, MotorType.kBrushless);
+  private SparkMax hopperController = new SparkMax(Constants.HopperConstants.kHopperMotorId, MotorType.kBrushed);
 
   private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
     .withControlMode(ControlMode.OPEN_LOOP)
     .withTelemetry("HopperMotor", TelemetryVerbosity.HIGH)
     .withGearing(new MechanismGearing(GearBox.fromReductionStages(4))) // 4:1 gear reduction
     .withMotorInverted(Constants.HopperConstants.kHopperMotorInverted)
-    .withIdleMode(MotorMode.BRAKE)
+    .withIdleMode(MotorMode.COAST)
     .withStatorCurrentLimit(Amps.of(40));
   
   private SmartMotorController smc = new SparkWrapper(hopperController, DCMotor.getCIM(1), smcConfig);

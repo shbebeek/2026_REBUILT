@@ -75,7 +75,11 @@ public class ShooterSubsystem extends SubsystemBase{
     }
 
     public Command spinUp(){
-        return setSpeed(RPM.of(Constants.ShooterConstants.SHOOTER_SPEED));
+        return setSpeed(RPM.of(-Constants.ShooterConstants.SHOOTER_SPEED));
+    }
+
+    public Command spinUpSlow(){
+        return setSpeed(RPM.of(-500));
     }
 
     public Command stop(){

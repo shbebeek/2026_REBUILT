@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +34,7 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class IntakeSubsystem extends SubsystemBase{
-    private SparkMax rollerController = new SparkMax(Constants.IntakeConstants.kRollerMotorId,MotorType.kBrushed);
+    private SparkMax rollerController = new SparkMax(Constants.IntakeConstants.kRollerMotorId,MotorType.kBrushless);
     private SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
         .withControlMode(ControlMode.OPEN_LOOP)
         .withTelemetry("IntakeRollerMotor", TelemetryVerbosity.HIGH)
@@ -57,13 +58,14 @@ public class IntakeSubsystem extends SubsystemBase{
     private SmartMotorControllerConfig intakePivotSmartMotorConfig = new SmartMotorControllerConfig(this)
         .withControlMode(ControlMode.CLOSED_LOOP)
         .withClosedLoopController(25,0,0,DegreesPerSecond.of(360),DegreesPerSecondPerSecond.of(360))
+        .withFeedforward(new SimpleMotorFeedforward(0, 10, 0))
         .withTelemetry("IntakePivotMotor", TelemetryVerbosity.HIGH)
         .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 5, 6, 60.0 / 18.0)))
         // .withGearing(new MechanismGearing(GearBox.fromReductionStages(5, 5, 60.0 / 18.0, 42)))
         .withMotorInverted(Constants.IntakeConstants.kPivotMotorInverted)
-        .withIdleMode(MotorMode.COAST)
-        .withSoftLimit(Degrees.of(0), Degrees.of(150))
-        .withStatorCurrentLimit(Amps.of(10))
+        .withIdleMode(MotorMode.BRAKE)
+        //.withSoftLimit(Degrees.of(0), Degrees.of(150))
+        .withStatorCurrentLimit(Amps.of(40))
         .withClosedLoopRampRate(Seconds.of(0.1))
         .withOpenLoopRampRate(Seconds.of(0.1));
     
@@ -72,8 +74,8 @@ public class IntakeSubsystem extends SubsystemBase{
     private SmartMotorController intakePivotController = new SparkWrapper(pivotMotor, DCMotor.getNEO(1),intakePivotSmartMotorConfig);
 
     private final ArmConfig intakePivotConfig = new ArmConfig(intakePivotController)
-        .withSoftLimits(Degrees.of(0), Degrees.of(150))
-        .withHardLimit(Degrees.of(0), Degrees.of(155))
+        //.withSoftLimits(Degrees.of(0), Degrees.of(150))
+        //.withHardLimit(Degrees.of(0), Degrees.of(155))
         .withStartingPosition(Degrees.of(0))
         .withLength(Feet.of(1))
         .withMass(Pounds.of(2))
@@ -85,14 +87,19 @@ public class IntakeSubsystem extends SubsystemBase{
         
     }
 
-    // run intake while held
+    // run intake (need stopIntake)
     public Command intakeCommand(){
-        return intake.set(Constants.IntakeConstants.INTAKE_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Intake.Run");
+        return intake.set(-Constants.IntakeConstants.INTAKE_SPEED).withName("Intake.Run");
+    }
+
+    // stop intake
+    public Command stopIntake(){
+        return intake.set(0).withName("Intake.Stop");
     }
 
     // eject while held
     public Command ejectCommand(){
-        return intake.set(-Constants.IntakeConstants.INTAKE_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Intake.Eject");
+        return intake.set(Constants.IntakeConstants.INTAKE_SPEED).finallyDo(() -> smc.setDutyCycle(0)).withName("Intake.Eject");
     }
 
     // angle intake at a specific angle
@@ -109,7 +116,7 @@ public class IntakeSubsystem extends SubsystemBase{
     public Command deployAndRollCommand(){
         return Commands.run(() -> {
             setIntakeDeployed();
-            smc.setDutyCycle(Constants.IntakeConstants.INTAKE_SPEED);
+            smc.setDutyCycle(-Constants.IntakeConstants.INTAKE_SPEED);
         }, this).finallyDo(() -> {
             smc.setDutyCycle(0);
             setIntakeHold();
@@ -120,7 +127,7 @@ public class IntakeSubsystem extends SubsystemBase{
     public Command backFeedAndRollCommand(){
         return Commands.run(() -> {
             setIntakeDeployed();
-            smc.setDutyCycle(-Constants.IntakeConstants.INTAKE_SPEED);
+            smc.setDutyCycle(Constants.IntakeConstants.INTAKE_SPEED);
         }, this).finallyDo(() -> {
             smc.setDutyCycle(0);
             setIntakeHold();
@@ -132,6 +139,18 @@ public class IntakeSubsystem extends SubsystemBase{
             setIntakeStow();
             smc.setDutyCycle(0);
         }, this).withName("Intake.StowIntake");
+    }
+
+    public Command deployIntake(){
+        return Commands.run(() -> intakePivotController.setDutyCycle(-0.1));
+    }
+
+    public Command returnIntake(){
+        return Commands.run(() -> intakePivotController.setDutyCycle(0.1));
+    }
+
+    public Command stopPivot(){
+        return Commands.run(() -> intakePivotController.setDutyCycle(0));
     }
 
     private void setIntakeStow(){
