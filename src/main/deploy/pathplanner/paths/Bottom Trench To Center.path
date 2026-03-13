@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 4.347174595424107,
+        "y": 0.5167940266927087
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 5.347174595424107,
+        "y": 0.5167940266927087
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Bottom Trench"
     },
     {
       "anchor": {
-        "x": 2.2923395149786017,
-        "y": 4.287303851640513
+        "x": 7.636383405412946,
+        "y": 1.4197320847284232
       },
       "prevControl": {
-        "x": 1.2923395149786017,
-        "y": 4.287303851640513
+        "x": 7.271654023670015,
+        "y": 0.6511233956473219
+      },
+      "nextControl": {
+        "x": 8.001112787155877,
+        "y": 2.188340773809522
+      },
+      "isLocked": false,
+      "linkedName": "Bottom of Pile"
+    },
+    {
+      "anchor": {
+        "x": 7.806092122395832,
+        "y": 3.5912287830171135
+      },
+      "prevControl": {
+        "x": 7.726717994326636,
+        "y": 3.0120576404389885
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Center(Bottom)"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 91.93949562349178
   },
   "reversed": false,
   "folder": null,
